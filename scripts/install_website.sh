@@ -55,7 +55,7 @@ mkdir -p "$NGINX_CONFIG/sites-enabled/extension"
 mkdir -p "$NGINX_LOGS/default"
 cp website/nginx.conf "$NGINX_CONFIG/nginx.conf"
 cp website/default.conf "$NGINX_CONFIG/conf.d/default.conf"
-cp website/extension/* "$NGINX_CONFIG/sites-enabled/extension"
+cp -r website/extension/* "$NGINX_CONFIG/sites-enabled/extension"
 cp -r website/default/* "$WEBSITE_ROOT/default"
 docker restart "$NGINX_DOCKER"
 

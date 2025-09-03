@@ -98,13 +98,17 @@ while true; do
             script_name=$(basename "$task_url")
             
             if [[ "$task_url" =~ ^http ]]; then
-                task_full_url="$task_url"
                 echo "📥 下载任务脚本: $script_name"
-                curl -fsSL "$task_full_url" -o "$script_name"
+                curl -fsSL "$task_url" -o "$script_name"
             else
                 task_full_url="$SCRIPT_ROOT/$task_url"
-                echo "📥 下载任务脚本: $script_name"
-                cp "$task_full_url" "$script_name"
+                if [[ "$task_full_url" =~ ^http ]]; then
+                    echo "📥 下载任务脚本: $script_name"
+                    curl -fsSL "$task_full_url" -o "$script_name"
+                else
+                    echo "📥 复制任务脚本: $script_name"
+                    cp "$task_full_url" "$script_name"
+                fi
             fi
 
             echo

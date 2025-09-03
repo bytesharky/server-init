@@ -191,7 +191,7 @@ while true; do
 done
 
 # ========================
-# 修改 resolv.conf：保证第一DNS是127.0.0.1
+# 修改 resolv.conf：保证第一DNS是127.0.0.1，并禁用 options rotate
 # ========================
 echo "设置 DNS 服务器为 127.0.0.1"
 
@@ -200,7 +200,7 @@ TARGET=$(readlink -f "$RESOLV")
 [ -z "$TARGET" ] && TARGET="$RESOLV"
 
 first_dns=$(grep '^nameserver' "$TARGET" | head -n1 | awk '{print $2}')
-if [ "$first_dns" = "127.0.0.1" ]; then
+if [ "$first_dns" = "127.0.0.1" ] && ! grep -q '^options rotate' "$TARGET"; then
     echo "DNS 已经正确，无需修改"
 else
     TMPFILE=$(mktemp)
@@ -215,8 +215,8 @@ else
       done
     } > "$TMPFILE"
 
-    # 追加非 nameserver 配置
-    grep -v '^nameserver' "$TARGET" >> "$TMPFILE"
+    # 追加非 nameserver 配置，但注释掉 options rotate
+    grep -v '^nameserver' "$TARGET" | sed 's/^options rotate/#&/' >> "$TMPFILE"
 
     # 覆盖原文件
     cat "$TMPFILE" > "$TARGET"

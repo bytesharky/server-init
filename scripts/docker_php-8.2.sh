@@ -91,7 +91,7 @@ cat > /data/docker/php-fpm/php-8.2.conf <<EOF
 daemonize = no
 
 [www]
-listen = unxix:/var/run/php-fpm-8.2.sock
+listen = /run/php-fpm-8.2.sock
 listen.owner = www-data
 listen.group = www-data
 listen.mode = 0660

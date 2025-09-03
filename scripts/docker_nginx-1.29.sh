@@ -51,6 +51,7 @@ start_container() {
         -p 443:443/tcp \
         -p 443:443/udp \
         -e TZ=Asia/Shanghai \
+        -e RELOAD_PORT=8888 \
         -v $NGINX_PATH/conf:/etc/nginx \
         -v $NGINX_PATH/logs:/var/log/nginx \
         -v $NGINX_PATH/certs:/var/certs \

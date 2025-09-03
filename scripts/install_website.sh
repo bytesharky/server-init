@@ -21,7 +21,8 @@ done
 
 # 定义默认值
 DEFAULT_NGINX_DOCKER="nginx-1.29"
-DEFAULT_NGINX_CONFIG="/data/docker/nginx/nginx.conf"
+DEFAULT_NGINX_CONFIG="/data/docker/nginx/conf"
+DEFAULT_NGINX_LOGS="/data/docker/nginx/logs"
 DEFAULT_WEBSITE_ROOT="/data/docker/nginx/websites"
 
 read -p "请输入Nginx容器名称 (默认: $DEFAULT_NGINX_DOCKER): " NGINX_DOCKER
@@ -29,6 +30,9 @@ NGINX_DOCKER=${NGINX_DOCKER:-$DEFAULT_NGINX_DOCKER}
 
 read -p "请输入Nginx配置文件路径 (默认: $DEFAULT_NGINX_CONFIG): " NGINX_CONFIG
 NGINX_CONFIG=${NGINX_CONFIG:-$DEFAULT_NGINX_CONFIG}
+
+read -p "请输入Nginx日志目录 (默认: $DEFAULT_NGINX_LOGS): " NGINX_LOGS
+NGINX_LOGS=${NGINX_LOGS:-$DEFAULT_NGINX_LOGS}
 
 read -p "请输入网站根目录 (默认: $DEFAULT_WEBSITE_ROOT): " WEBSITE_ROOT
 WEBSITE_ROOT=${WEBSITE_ROOT:-$DEFAULT_WEBSITE_ROOT}
@@ -38,6 +42,7 @@ echo "----------------------------------------"
 echo "已配置的参数："
 echo "Nginx容器名称: $NGINX_DOCKER"
 echo "Nginx配置文件路径: $NGINX_CONFIG"
+echo "Nginx日志目录: $NGINX_LOGS"
 echo "网站根目录: $WEBSITE_ROOT"
 echo "----------------------------------------"
 
@@ -45,8 +50,8 @@ curl -OJ https://gitee.com/bytesharky/server-init/raw/main/default_website.zip
 unzip default_website.zip -d website
 rm -f default_website.zip
 
-mkdir -p "$WEBSITE_ROOT/default" "$NGINX_CONFIG/sites-enabled/extension"
-cp website/nginx.conf "$NGINX_CONFIG"
+mkdir -p "$WEBSITE_ROOT/default" "$NGINX_CONFIG/sites-enabled/extension" "$NGINX_LOGS/default"
+cp website/nginx.conf "$NGINX_CONFIG/nginx.conf"
 cp website/default.conf "$NGINX_CONFIG/conf.d/default.conf"
 cp website/extension/* "$NGINX_CONFIG/sites-enabled/extension"
 cp -r website/default/* "$WEBSITE_ROOT/default"

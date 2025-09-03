@@ -50,7 +50,9 @@ curl -OJ https://gitee.com/bytesharky/server-init/raw/main/default_website.zip
 unzip default_website.zip -d website
 rm -f default_website.zip
 
-mkdir -p "$WEBSITE_ROOT/default" "$NGINX_CONFIG/sites-enabled/extension" "$NGINX_LOGS/default"
+mkdir -p "$WEBSITE_ROOT/default" 
+mkdir -p "$NGINX_CONFIG/sites-enabled/extension"
+mkdir -p "$NGINX_LOGS/default"
 cp website/nginx.conf "$NGINX_CONFIG/nginx.conf"
 cp website/default.conf "$NGINX_CONFIG/conf.d/default.conf"
 cp website/extension/* "$NGINX_CONFIG/sites-enabled/extension"

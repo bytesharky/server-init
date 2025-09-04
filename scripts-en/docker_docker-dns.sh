@@ -7,6 +7,8 @@ DEFAULT_GATEWAY_IP="172.18.0.1"
 DEFAULT_NETWORK_ADDRESS="172.18.0.0/24"
 DEFAULT_RESOLV="/etc/resolv.conf"
 DEFAULT_CONTAINER_NAME="docker-dns"
+
+REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/docker-dns:alpine"
 DEFAULT_IMAGE_NAME="docker-dns:alpine"
 DEFAULT_TZ="Asia/Shanghai"
 MUSL_TZ=""
@@ -150,45 +152,12 @@ else
 fi
 
 # ========================
-# Build image (optional)
-# ========================
-# echo "Building image..."
-# git clone https://github.com/bytesharky/docker-dns
-# cd docker-dns
-# docker build -t $IMAGE_NAME .
-# echo "Image build complete"
-
-# ========================
 # Pull image
 # ========================
-# echo "Pulling image..."
-# docker pull ccr.ccs.tencentyun.com/sharky/docker-dns:alpine
-# docker tag ccr.ccs.tencentyun.com/sharky/docker-dns:alpine $IMAGE_NAME
-# echo "Image pull complete"
-
-echo "Select operation:"
-echo "1) Build image"
-echo "2) Pull image"
-
-while true; do
-    read -r -p "Enter option [1-2]: " choice
-    case "$choice" in
-        1)
-            echo "Building image..."
-            docker build -t "$IMAGE_NAME" .
-            echo "Image build complete"
-            break
-            ;;
-        2)
-            echo "Pulling image..."
-            docker pull ccr.ccs.tencentyun.com/sharky/docker-dns:alpine
-            docker tag ccr.ccs.tencentyun.com/sharky/docker-dns:alpine "$IMAGE_NAME"
-            echo "Image pull complete"
-            break
-            ;;
-        *) ;;
-    esac
-done
+echo "Pulling image..."
+docker pull "$REMOTE_IMAGE_NAME"
+docker tag "$REMOTE_IMAGE_NAME" "$LOCAL_IMAGE_NAME"
+echo "Image pulled successfully"
 
 # ========================
 # Modify resolv.conf: ensure first DNS is 127.0.0.1 and disable options rotate

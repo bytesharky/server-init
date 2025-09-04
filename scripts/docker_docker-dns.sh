@@ -7,6 +7,8 @@ DEFAULT_GATEWAY_IP="172.18.0.1"
 DEFAULT_NETWORK_ADDRESS="172.18.0.0/24"
 DEFAULT_RESOLV="/etc/resolv.conf"
 DEFAULT_CONTAINER_NAME="docker-dns"
+
+REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/docker-dns:alpine"
 DEFAULT_IMAGE_NAME="docker-dns:alpine"
 DEFAULT_TZ="Asia/Shanghai"
 MUSL_TZ=""
@@ -150,45 +152,13 @@ else
 fi
 
 # ========================
-# 构建镜像（可选）
-# ========================
-# echo "构建镜像..."
-# git clone https://github.com/bytesharky/docker-dns
-# cd docker-dns
-# docker build -t $IMAGE_NAME .
-# echo "镜像构建完成"
-
-# ========================
 # 拉取镜像
 # ========================
-# echo "拉取镜像..."
-# docker pull ccr.ccs.tencentyun.com/sharky/docker-dns:alpine
-# docker tag ccr.ccs.tencentyun.com/sharky/docker-dns:alpine $IMAGE_NAME
-# echo "镜像拉取完成"
+echo "拉取镜像..."
+docker pull "$REMOTE_IMAGE_NAME"
+docker tag "$REMOTE_IMAGE_NAME" "$LOCAL_IMAGE_NAME"
+echo "镜像拉取完成"
 
-echo "请选择操作："
-echo "1) 构建镜像"
-echo "2) 拉取镜像"
-
-while true; do
-    read -r -p "请输入选项 [1-2]: " choice
-    case "$choice" in
-        1)
-            echo "构建镜像..."
-            docker build -t "$IMAGE_NAME" .
-            echo "镜像构建完成"
-            break
-            ;;
-        2)
-            echo "拉取镜像..."
-            docker pull ccr.ccs.tencentyun.com/sharky/docker-dns:alpine
-            docker tag ccr.ccs.tencentyun.com/sharky/docker-dns:alpine "$IMAGE_NAME"
-            echo "镜像拉取完成"
-            break
-            ;;
-        *) ;;
-    esac
-done
 
 # ========================
 # 修改 resolv.conf：保证第一DNS是127.0.0.1，并禁用 options rotate

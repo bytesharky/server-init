@@ -4,8 +4,6 @@ set -e
 # Define default values
 DEFAULT_DOCKER_NET="docker-net"
 DEFAULT_CONTAINER_NAME="java8-env"
-DEFAULT_Tencent_SecretId="Tencent_SecretId"
-DEFAULT_Tencent_SecretKey="Tencent_SecretKey"
 
 REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/java8-env:latest"
 DEFAULT_IMAGE_NAME="java8-env:latest"

@@ -12,20 +12,44 @@ _该项目仅为方便本人配置服务器使用，并不保证兼容_
 
 ### 国内使用
 
-```bash
-curl -OJ https://gitee.com/bytesharky/server-init/raw/main/server-init.sh
+1. **常规使用**
 
-chmod +x server-init.sh
+    ```bash
+    curl -OJ https://gitee.com/bytesharky/server-init/raw/main/server-init.sh
 
-./server-init.sh
-```
+    chmod +x server-init.sh
+
+    ./server-init.sh
+    ```
+
+2. **中文乱码时使用**
+
+    ```bash
+    curl -OJ https://gitee.com/bytesharky/server-init/raw/main/server-init-en.sh
+
+    chmod +x server-init-en.sh
+
+    ./server-init-en.sh
+    ```
 
 ### 国外使用
 
-```bash
-curl -OJ https://raw.githubusercontent.com/bytesharky/server-init/refs/heads/main/server-init.sh
+1. **常规使用**
 
-chmod +x server-init.sh
+    ```bash
+    curl -OJ https://raw.githubusercontent.com/bytesharky/server-init/refs/heads/main/server-init.sh
 
-./server-init.sh
-```
+    chmod +x server-init.sh
+
+    ./server-init.sh
+    ```
+
+2. **中文乱码时使用**
+
+    ```bash
+    curl -OJ https://raw.githubusercontent.com/bytesharky/server-init/refs/heads/main/server-init-en.sh
+
+    chmod +x server-init-en.sh
+
+    ./server-init-en.sh
+    ```

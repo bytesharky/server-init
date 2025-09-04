@@ -1,87 +1,87 @@
 #!/bin/bash
 set -e
 
-echo "检测系统类型..."
+echo "Detecting operating system type..."
 if [ -f /etc/os-release ]; then
     . /etc/os-release
     OS=$ID
 else
-    echo "无法识别操作系统"
+    echo "Unable to identify operating system"
     exit 1
 fi
 
 install_docker_ubuntu() {
-    echo "更新系统..."
+    echo "Updating system..."
     sudo apt-get update
     sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
-    echo "添加 Docker 官方 GPG key..."
+    echo "Adding Docker official GPG key..."
     sudo install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-    echo "添加 Docker Ubuntu 仓库..."
+    echo "Adding Docker Ubuntu repository..."
     echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
       $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    echo "安装 Docker..."
+    echo "Installing Docker..."
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 }
 
 install_docker_debian() {
-    echo "更新系统..."
+    echo "Updating system..."
     sudo apt-get update
     sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
-    echo "添加 Docker 官方 GPG key..."
+    echo "Adding Docker official GPG key..."
     sudo install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-    echo "添加 Docker Debian 仓库..."
+    echo "Adding Docker Debian repository..."
     echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
       $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-    echo "安装 Docker..."
+    echo "Installing Docker..."
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 }
 
 install_docker_centos() {
-    echo "安装依赖..."
+    echo "Installing dependencies..."
     sudo yum install -y yum-utils ca-certificates curl gnupg2
 
-    echo "添加 Docker 仓库..."
+    echo "Adding Docker repository..."
     sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-    echo "安装 Docker..."
+    echo "Installing Docker..."
     sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 }
 
 set_china_mirror() {
-    echo "配置中国镜像源..."
+    echo "Configuring China registry mirror..."
     sudo mkdir -p /etc/docker
     cat <<EOF | sudo tee /etc/docker/daemon.json
 {
   "registry-mirrors": ["https://docker.1ms.run"]
 }
 EOF
-    echo "重启 Docker..."
+    echo "Restarting Docker..."
     sudo systemctl daemon-reload
     sudo systemctl restart docker
 }
 
-echo "请选择操作："
-echo "1) 安装 Docker"
-echo "2) 配置中国镜像源"
-echo "3) 退出"
+echo "Please select an option:"
+echo "1) Install Docker"
+echo "2) Configure China registry mirror"
+echo "3) Exit"
 
 while true; do
-    read -r -p "请输入选项 [1-3]: " choice
+    read -r -p "Enter your choice [1-3]: " choice
     case "$choice" in
         1)
-            echo "安装 Docker..."
+            echo "Installing Docker..."
             case "$OS" in
                 ubuntu)
                     install_docker_ubuntu
@@ -93,15 +93,15 @@ while true; do
                     install_docker_centos
                     ;;
                 *)
-                    echo "不支持的系统: $OS"
+                    echo "Unsupported system: $OS"
                     exit 1
                     ;;
             esac
-            echo "启动 Docker 并设置开机自启..."
+            echo "Starting Docker and enabling auto-start on boot..."
             sudo systemctl enable docker
             sudo systemctl start docker
 
-            echo "Docker 安装完成，版本信息："
+            echo "Docker installation completed, version info:"
             docker --version
             break
             ;;

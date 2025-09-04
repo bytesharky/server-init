@@ -72,28 +72,46 @@ EOF
     sudo systemctl restart docker
 }
 
-echo "安装 Docker..."
-case "$OS" in
-    ubuntu)
-        install_docker_ubuntu
-        ;;
-    debian)
-        install_docker_debian
-        ;;
-    centos|rhel|fedora)
-        install_docker_centos
-        ;;
-    *)
-        echo "不支持的系统: $OS"
-        exit 1
-        ;;
-esac
+echo "请选择操作："
+echo "1) 安装 Docker"
+echo "2) 配置中国镜像源"
+echo "3) 退出"
 
-set_china_mirror
+while true; do
+    read -r -p "请输入选项 [1-3]: " choice
+    case "$choice" in
+        1)
+            echo "安装 Docker..."
+            case "$OS" in
+                ubuntu)
+                    install_docker_ubuntu
+                    ;;
+                debian)
+                    install_docker_debian
+                    ;;
+                centos|rhel|fedora)
+                    install_docker_centos
+                    ;;
+                *)
+                    echo "不支持的系统: $OS"
+                    exit 1
+                    ;;
+            esac
+            echo "启动 Docker 并设置开机自启..."
+            sudo systemctl enable docker
+            sudo systemctl start docker
 
-echo "启动 Docker 并设置开机自启..."
-sudo systemctl enable docker
-sudo systemctl start docker
-
-echo "✅ Docker 安装完成，版本信息："
-docker --version
+            echo "✅ Docker 安装完成，版本信息："
+            docker --version
+            break
+            ;;
+        2)
+            set_china_mirror
+            break
+            ;;
+        3)
+            exit 0
+            ;;
+        *) ;;
+    esac
+done

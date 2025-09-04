@@ -11,6 +11,7 @@ Docker容器          Nginx-1.29      docker_nginx-1.29.sh
 Docker容器          PHP-8.2         docker_php-8.2.sh
 Docker容器          MySql-5.7       docker_mysql-5.7.sh
 Docker容器          MySql-8.2       docker_mysql-8.2.sh
+Docker容器          Mariadb-11.8    docker_mariadb-11.8.sh
 Docker容器          Varnish-7       docker_varnish-7.2.sh
 Docker容器          Redis-7.2       docker_redis-7.2.sh
 Docker容器          acme.sh         docker_acmesh.sh

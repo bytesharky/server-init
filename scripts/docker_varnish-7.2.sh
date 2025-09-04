@@ -3,7 +3,7 @@ set -e
 
 # 定义默认值
 DEFAULT_DOCKER_NET="docker-net"
-DEFAULT_CONTAINER_NAME="varnish"
+DEFAULT_CONTAINER_NAME="varnish-7.2"
 
 REMOTE_IMAGE_NAME="varnish:7.2"
 DEFAULT_IMAGE_NAME="varnish:7.2"

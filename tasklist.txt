@@ -3,6 +3,7 @@
 #   环境配置
 环境配置            Docker环境      install_docker.sh
 环境配置            命令别名         setup_alias.sh
+环境配置            配置ssh选项      control_ssh_auth.sh
 
 # 部署Docker容器 
 Docker容器          Java8编译环境    docker_java8-env.sh

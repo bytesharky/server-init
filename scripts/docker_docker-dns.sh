@@ -8,8 +8,8 @@ DEFAULT_NETWORK_ADDRESS="172.18.0.0/24"
 DEFAULT_RESOLV="/etc/resolv.conf"
 DEFAULT_CONTAINER_NAME="docker-dns"
 
-REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/docker-dns:alpine"
-DEFAULT_IMAGE_NAME="docker-dns:alpine"
+REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/docker-dns:static"
+DEFAULT_IMAGE_NAME="docker-dns:static"
 DEFAULT_TZ="Asia/Shanghai"
 MUSL_TZ=""
 RESTART="unless-stopped"
@@ -21,6 +21,7 @@ start_container() {
     name="$1"
     echo "启动容器 $name..."
     docker run -d \
+        -e LOG_LEVEL=INFO \
         -e "TZ=$MUSL_TZ" \
         -e "DEBUG=false" \
         -e "GATEWAY=gateway" \
@@ -29,7 +30,12 @@ start_container() {
         --restart "$RESTART" \
         --network "$DOCKER_NET" \
         --name "$name" \
-        "$IMAGE_NAME"
+        "$LOCAL_IMAGE_NAME"
+
+        # 如果需要挂载时区文件，
+        # 可以使用下面两行替换上面的 -e "TZ=$MUSL_TZ" \
+        # -e TZ=/zoneinfo/Asia/Shanghai \
+        # -v /usr/share/zoneinfo:/zoneinfo:ro \
 }
 
 # ========================
@@ -102,7 +108,7 @@ read -p "请输入容器名称 (默认: $DEFAULT_CONTAINER_NAME): " CONTAINER_NA
 CONTAINER_NAME=${CONTAINER_NAME:-$DEFAULT_CONTAINER_NAME}
 
 read -p "请输入镜像名称 (默认: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
-IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
+LOCAL_IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
 
 DEFAULT_TZ=$(get_system_timezone)
 
@@ -118,7 +124,7 @@ echo "网关IP地址: $GATEWAY_IP"
 echo "网络地址: $NETWORK_ADDRESS"
 echo "resolv路径: $RESOLV"
 echo "容器名称: $CONTAINER_NAME"
-echo "镜像名称: $IMAGE_NAME"
+echo "镜像名称: $LOCAL_IMAGE_NAME"
 echo "标准时区: $TZ"
 echo "musl 时区: $MUSL_TZ"
 echo "----------------------------------------"

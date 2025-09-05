@@ -8,8 +8,8 @@ DEFAULT_NETWORK_ADDRESS="172.18.0.0/24"
 DEFAULT_RESOLV="/etc/resolv.conf"
 DEFAULT_CONTAINER_NAME="docker-dns"
 
-REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/docker-dns:alpine"
-DEFAULT_IMAGE_NAME="docker-dns:alpine"
+REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/docker-dns:static"
+DEFAULT_IMAGE_NAME="docker-dns:static"
 DEFAULT_TZ="Asia/Shanghai"
 MUSL_TZ=""
 RESTART="unless-stopped"
@@ -21,6 +21,7 @@ start_container() {
     name="$1"
     echo "Starting container $name..."
     docker run -d \
+        -e LOG_LEVEL=INFO \
         -e "TZ=$MUSL_TZ" \
         -e "DEBUG=false" \
         -e "GATEWAY=gateway" \
@@ -29,7 +30,12 @@ start_container() {
         --restart "$RESTART" \
         --network "$DOCKER_NET" \
         --name "$name" \
-        "$IMAGE_NAME"
+        "$LOCAL_IMAGE_NAME"
+
+        # If you need to mount the timezone file, 
+        # you can use the following two lines to replace the above -e "TZ=$MUSL_TZ" \
+        # -e TZ=/zoneinfo/Asia/Shanghai \
+        # -v /usr/share/zoneinfo:/zoneinfo:ro \
 }
 
 # ========================
@@ -102,7 +108,7 @@ read -p "Enter container name (default: $DEFAULT_CONTAINER_NAME): " CONTAINER_NA
 CONTAINER_NAME=${CONTAINER_NAME:-$DEFAULT_CONTAINER_NAME}
 
 read -p "Enter image name (default: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
-IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
+LOCAL_IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
 
 DEFAULT_TZ=$(get_system_timezone)
 
@@ -118,7 +124,7 @@ echo "Gateway IP address: $GATEWAY_IP"
 echo "Network address: $NETWORK_ADDRESS"
 echo "resolv path: $RESOLV"
 echo "Container name: $CONTAINER_NAME"
-echo "Image name: $IMAGE_NAME"
+echo "Image name: $LOCAL_IMAGE_NAME"
 echo "Standard timezone: $TZ"
 echo "musl timezone: $MUSL_TZ"
 echo "----------------------------------------"

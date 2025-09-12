@@ -3,15 +3,15 @@ set -e
 
 # 定义默认值
 DEFAULT_DOCKER_NET="docker-net"
-DEFAULT_CONTAINER_NAME="nginx-1.29"
-NGINX_PATH="/data/docker/nginx"
-SOCK_PATH="/data/docker/php-fpm"
+DEFAULT_CONTAINER_NAME="qiniu-cert-sync"
+DEFAULT_CERT_DIR="/data/docker/acme/certs"
 
-REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/nginx:1.29"
-DEFAULT_IMAGE_NAME="sharky/nginx:1.29"
+DATA_DIR="/data/docker/qiniu-cert-sync"
+REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/qiniu-cert-sync"
+DEFAULT_IMAGE_NAME="sharky/qiniu-cert-sync"
 RESTART="unless-stopped"
 
-# 容器环境变量
+
 read -p "请输入Docker网络名称 (默认: $DEFAULT_DOCKER_NET): " DOCKER_NET
 DOCKER_NET=${DOCKER_NET:-$DEFAULT_DOCKER_NET}
 
@@ -21,12 +21,69 @@ CONTAINER_NAME=${CONTAINER_NAME:-$DEFAULT_CONTAINER_NAME}
 read -p "请输入镜像名称 (默认: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
 LOCAL_IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
 
+if [ -L "$DATA_DIR/certs" ]; then
+    DEFAULT_CERT_DIR=$(readlink "$DATA_DIR/certs")
+fi
+
+while true; do
+    read -p "请输入证书目录 (默认: $DEFAULT_CERT_DIR): " CERT_DIR
+    CERT_DIR=${CERT_DIR:=$DEFAULT_CERT_DIR}
+    if [ ! -d "$CERT_DIR" ]; then
+        echo "目录不存在"
+    else
+        break;
+    fi
+done
+
+
+mkdir -p "$DATA_DIR" "$DATA_DIR/config" "$DATA_DIR/logs"
+if [ -d "$DATA_DIR/certs" ] || [ -f "$DATA_DIR/certs" ] || [ -L "$DATA_DIR/certs" ] ; then
+    rm -rf "$DATA_DIR/certs"
+fi
+ln -s "$CERT_DIR" "$DATA_DIR/certs"
+
+ENV_FILE="$DATA_DIR/config/.env"
+if [[ -f "$ENV_FILE" ]]; then
+    read -p ".env 文件已存在，是否覆盖？(Y/N, 默认N): " OVERWRITE_ENV
+    OVERWRITE_ENV=${OVERWRITE_ENV:-N}
+else
+    OVERWRITE_ENV=Y
+fi
+
+if [[ "$OVERWRITE_ENV" =~ ^[Yy]$ ]]; then
+    read -p "请输入七牛云 AccessKey: " QINIU_ACCESS_KEY
+    read -s -p "请输入七牛云 SecretKey: " QINIU_SECRET_KEY
+    echo ""
+    cat > "$ENV_FILE" <<EOF
+QINIU_ACCESS_KEY=$QINIU_ACCESS_KEY
+QINIU_SECRET_KEY=$QINIU_SECRET_KEY
+EOF
+    echo "环境变量写入完成: $ENV_FILE"
+fi
+
+CRONTAB_FILE="$DATA_DIR/config/crontab"
+if [ -f "$CRONTAB_FILE" ]; then
+    read -p "crontab 文件已存在，是否覆盖？(Y/N, 默认N): " OVERWRITE_CRON
+    OVERWRITE_CRON=${OVERWRITE_CRON:-N}
+else
+    OVERWRITE_CRON=Y
+fi
+
+if [[ "$OVERWRITE_CRON" =~ ^[Yy]$ ]]; then
+    cat > "$CRONTAB_FILE" <<EOF
+# Default crontab for Qiniu Cert Sync
+0 3 * * * python /qiniu-cert-sync/qiniu-cert-sync.py >> /qiniu-cert-sync/logs/qiniu-cert-sync.log 2>&1
+EOF
+    printf "默认 crontab 已写入 %s (每天3点执行)\n" "$CRONTAB_FILE"
+fi
+
 # 显示最终配置
 echo "----------------------------------------"
 echo "已配置的参数："
 echo "Docker网络名称: $DOCKER_NET"
 echo "容器名称: $CONTAINER_NAME"
 echo "镜像名称: $LOCAL_IMAGE_NAME"
+echo "证书目录: $CERT_DIR"
 echo "----------------------------------------"
 
 # 确认继续
@@ -47,20 +104,12 @@ start_container() {
     name="$1"
     echo "启动容器 $name..."
     docker run -d \
-        -p 80:80 \
-        -p 443:443/tcp \
-        -p 443:443/udp \
         -e TZ=Asia/Shanghai \
-        -e RELOAD_PORT=8888 \
-        -v $NGINX_PATH/conf:/etc/nginx \
-        -v $NGINX_PATH/logs:/var/log/nginx \
-        -v $NGINX_PATH/certs:/var/certs \
-        -v $NGINX_PATH/websites:/var/websites \
-        -v $SOCK_PATH:/var/run \
-        --name "$name" \
-        --restart "$RESTART" \
-        --network "$DOCKER_NET" \
-        "$LOCAL_IMAGE_NAME"
+        -v "$DATA_DIR/certs:/qiniu-cert-sync/certs" \
+        -v "$DATA_DIR/logs:/qiniu-cert-sync/logs" \
+        -v "$DATA_DIR/config:/qiniu-cert-sync/config" \
+        --name "$CONTAINER_NAME" \
+        ccr.ccs.tencentyun.com/sharky/qiniu-cert-sync
 }
 
 # ========================

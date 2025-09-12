@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# 定义默认值
+# Define default values
 DEFAULT_DOCKER_NET="docker-net"
 DEFAULT_GATEWAY_IP="172.18.0.1"
 DEFAULT_NETWORK_ADDRESS="172.18.0.0/24"
@@ -15,11 +15,11 @@ MUSL_TZ=""
 RESTART="unless-stopped"
 
 # ========================
-# 启动容器函数
+# Container startup function
 # ========================
 start_container() {
     name="$1"
-    echo "启动容器 $name..."
+    echo "Starting container $name..."
     docker run -d \
         -e LOG_LEVEL=WARN \
         -e "TZ=$MUSL_TZ" \
@@ -31,14 +31,14 @@ start_container() {
         --name "$name" \
         "$LOCAL_IMAGE_NAME"
 
-        # 如果需要挂载时区文件，
-        # 可以使用下面两行替换上面的 -e "TZ=$MUSL_TZ" \
+        # If you need to mount the timezone file, 
+        # you can use the following two lines to replace the above -e "TZ=$MUSL_TZ" \
         # -e TZ=/zoneinfo/Asia/Shanghai \
         # -v /usr/share/zoneinfo:/zoneinfo:ro \
 }
 
 # ========================
-# 获取宿主机时区名称
+# Get host system timezone name
 # ========================
 get_system_timezone() {
     if command -v timedatectl >/dev/null 2>&1; then
@@ -53,21 +53,21 @@ get_system_timezone() {
 }
 
 # ========================
-# 转换为 musl 可识别的 TZ
+# Convert to musl-compatible TZ
 # ========================
 to_musl_tz() {
     TZ_NAME="$1"
 
     if echo "$TZ_NAME" | grep -Eq '^[Uu][Tt][Cc][+-][0-9]{1,2}(:[0-9]{1,2})?$'; then
-        # 解析 UTC±N 或 UTC±N:MM
+        # Parse UTC±N or UTC±N:MM
         SIGN=$(echo "$TZ_NAME" | grep -oE '[+-]' | head -n1)
         HOUR=$(echo "$TZ_NAME" | grep -oE '[0-9]{1,2}' | head -n1)
         MIN=$(echo "$TZ_NAME" | grep -oE ':[0-9]{1,2}' | cut -c2-)
     else
-        # tzdata 名称
+        # tzdata name
         OFFSET=$(TZ="$TZ_NAME" date +%z)
         if [ "$OFFSET" = "+0000" ] && [ "$TZ_NAME" != "UTC" ]; then
-            echo "警告: 无法识别时区 $TZ_NAME，回退到 UTC" >&2
+            echo "Warning: Unrecognized timezone $TZ_NAME, fallback to UTC" >&2
             SIGN="+"
             HOUR="00"
             MIN="00"
@@ -90,47 +90,47 @@ to_musl_tz() {
     echo "UTC$SIGN$HOUR:$MIN"
 }
 
-# 提示用户输入并处理默认值
-read -p "请输入Docker网络名称 (默认: $DEFAULT_DOCKER_NET): " DOCKER_NET
+# Prompt user for input and handle defaults
+read -p "Enter Docker network name (default: $DEFAULT_DOCKER_NET): " DOCKER_NET
 DOCKER_NET=${DOCKER_NET:-$DEFAULT_DOCKER_NET}
 
-read -p "请输入网关IP地址 (默认: $DEFAULT_GATEWAY_IP): " GATEWAY_IP
+read -p "Enter gateway IP address (default: $DEFAULT_GATEWAY_IP): " GATEWAY_IP
 GATEWAY_IP=${GATEWAY_IP:-$DEFAULT_GATEWAY_IP}
 
-read -p "请输入网络地址 (默认: $DEFAULT_NETWORK_ADDRESS): " NETWORK_ADDRESS
+read -p "Enter network address (default: $DEFAULT_NETWORK_ADDRESS): " NETWORK_ADDRESS
 NETWORK_ADDRESS=${NETWORK_ADDRESS:-$DEFAULT_NETWORK_ADDRESS}
 
-read -p "请输入resolv路径 (默认: $DEFAULT_RESOLV): " RESOLV
+read -p "Enter resolv path (default: $DEFAULT_RESOLV): " RESOLV
 RESOLV=${RESOLV:-$DEFAULT_RESOLV}
 
-read -p "请输入容器名称 (默认: $DEFAULT_CONTAINER_NAME): " CONTAINER_NAME
+read -p "Enter container name (default: $DEFAULT_CONTAINER_NAME): " CONTAINER_NAME
 CONTAINER_NAME=${CONTAINER_NAME:-$DEFAULT_CONTAINER_NAME}
 
-read -p "请输入镜像名称 (默认: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
+read -p "Enter image name (default: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
 LOCAL_IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
 
 DEFAULT_TZ=$(get_system_timezone)
 
-read -p "请输入时区名称或UTC±N (默认: $DEFAULT_TZ): " TZ
+read -p "Enter timezone name or UTC±N (default: $DEFAULT_TZ): " TZ
 TZ=${TZ:-$DEFAULT_TZ}
 MUSL_TZ=$(to_musl_tz "$TZ")
 
-# 显示最终配置
+# Show final configuration
 echo "----------------------------------------"
-echo "已配置的参数："
-echo "Docker网络名称: $DOCKER_NET"
-echo "网关IP地址: $GATEWAY_IP"
-echo "网络地址: $NETWORK_ADDRESS"
-echo "resolv路径: $RESOLV"
-echo "容器名称: $CONTAINER_NAME"
-echo "镜像名称: $LOCAL_IMAGE_NAME"
-echo "标准时区: $TZ"
-echo "musl 时区: $MUSL_TZ"
+echo "Configured parameters:"
+echo "Docker network name: $DOCKER_NET"
+echo "Gateway IP address: $GATEWAY_IP"
+echo "Network address: $NETWORK_ADDRESS"
+echo "resolv path: $RESOLV"
+echo "Container name: $CONTAINER_NAME"
+echo "Image name: $LOCAL_IMAGE_NAME"
+echo "Standard timezone: $TZ"
+echo "musl timezone: $MUSL_TZ"
 echo "----------------------------------------"
 
-# 确认继续
+# Confirm to continue
 while true; do
-    read -p "是否确认继续部署? (Y/N) " yn
+    read -p "Confirm to continue deployment? (Y/N) " yn
     yn=${yn}
     case $yn in
         [Yy]* ) break;;
@@ -140,47 +140,46 @@ while true; do
 done
 
 # ========================
-# 检查 Docker 网络
+# Check Docker network
 # ========================
 GATEWAY_IP="172.18.0.1"
 NETWORK_ADDRESS="172.18.0.0/24"
 if ! docker network inspect "$DOCKER_NET" >/dev/null 2>&1; then
-    echo "Docker 网络 $DOCKER_NET 不存在，正在创建..."
+    echo "Docker network $DOCKER_NET does not exist, creating..."
     if docker network create "$DOCKER_NET" --subnet="$NETWORK_ADDRESS" --gateway="$GATEWAY_IP"; then
-        echo "Docker 网络 $DOCKER_NET 创建成功"
+        echo "Docker network $DOCKER_NET created successfully"
     else
-        echo "Docker 网络 $DOCKER_NET 创建失败"
+        echo "Failed to create Docker network $DOCKER_NET"
         exit 1
     fi
 else
-    echo "Docker 网络 $DOCKER_NET 已存在"
+    echo "Docker network $DOCKER_NET already exists"
 fi
 
 # ========================
-# 拉取镜像
+# Pull image
 # ========================
-echo "拉取镜像..."
+echo "Pulling image..."
 docker pull "$REMOTE_IMAGE_NAME"
 docker tag "$REMOTE_IMAGE_NAME" "$LOCAL_IMAGE_NAME"
-echo "镜像拉取完成"
-
+echo "Image pulled successfully"
 
 # ========================
-# 修改 resolv.conf：保证第一DNS是127.0.0.1，并禁用 options rotate
+# Modify resolv.conf: ensure first DNS is 127.0.0.1 and disable options rotate
 # ========================
-echo "设置 DNS 服务器为 127.0.0.1"
+echo "Setting DNS server to 127.0.0.1"
 
-# 如果是软链接，解析实际文件
+# If it's a symlink, resolve actual file
 TARGET=$(readlink -f "$RESOLV")
 [ -z "$TARGET" ] && TARGET="$RESOLV"
 
 first_dns=$(grep '^nameserver' "$TARGET" | head -n1 | awk '{print $2}')
 if [ "$first_dns" = "127.0.0.1" ] && ! grep -q '^options rotate' "$TARGET"; then
-    echo "DNS 已经正确，无需修改"
+    echo "DNS is already correct, no modification needed"
 else
     TMPFILE=$(mktemp)
 
-    # 拿到 nameserver 列表，排除 127.0.0.1
+    # Get nameserver list, exclude 127.0.0.1
     orig_dns=$(grep '^nameserver' "$TARGET" | awk '{print $2}' | grep -v '^127\.0\.0\.1$')
 
     {
@@ -190,44 +189,44 @@ else
       done
     } > "$TMPFILE"
 
-    # 追加非 nameserver 配置，但注释掉 options rotate
+    # Append non-nameserver config, but comment out options rotate
     grep -v '^nameserver' "$TARGET" | sed 's/^options rotate/#&/' >> "$TMPFILE"
 
-    # 覆盖原文件
+    # Overwrite original file
     cat "$TMPFILE" > "$TARGET"
     rm -f "$TMPFILE"
-    echo "DNS 服务器设置完成"
+    echo "DNS server setup complete"
 fi
 
 # ========================
-# 启动/处理容器
+# Start/handle container
 # ========================
 if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
-    echo "容器 $CONTAINER_NAME 已存在，请选择操作："
-    echo "1) 删除并重建容器"
-    echo "2) 使用新的容器名称"
-    echo "3) 退出"
+    echo "Container $CONTAINER_NAME already exists, select operation:"
+    echo "1) Delete and recreate container"
+    echo "2) Use a new container name"
+    echo "3) Exit"
     
     while true; do
-        read -r -p "请输入选项 [1-3]: " choice
+        read -r -p "Enter option [1-3]: " choice
         case "$choice" in
             1)
-                echo "删除旧容器..."
+                echo "Deleting old container..."
                 docker rm -f "$CONTAINER_NAME"
                 start_container "$CONTAINER_NAME"
                 break
                 ;;
             2)
-                read -r -p "请输入新容器名称: " newname
+                read -r -p "Enter new container name: " newname
                 if [ -z "$newname" ]; then
-                    echo "名称不能为空，退出"
+                    echo "Name cannot be empty, exiting"
                     exit 1
                 fi
                 start_container "$newname"
                 break
                 ;;
             3)
-                echo "已退出"
+                echo "Exited"
                 exit 0
                 ;;
             *) ;;
@@ -237,4 +236,5 @@ else
     start_container "$CONTAINER_NAME"
 fi
 
-echo "容器已启动"
+echo "Container started"
+

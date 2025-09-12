@@ -1,6 +1,6 @@
 # 分组名称          任务名称          脚本URL
 
-#   环境配置
+# 环境配置
 环境配置            Docker环境      install_docker.sh
 环境配置            命令别名         setup_alias.sh
 环境配置            配置ssh选项      control_ssh_auth.sh
@@ -13,9 +13,10 @@ Docker容器          PHP-8.2         docker_php-8.2.sh
 Docker容器          MySql-5.7       docker_mysql-5.7.sh
 Docker容器          MySql-8.2       docker_mysql-8.2.sh
 Docker容器          Mariadb-11.8    docker_mariadb-11.8.sh
-Docker容器          Varnish-7       docker_varnish-7.2.sh
+Docker容器          Varnish-7.2       docker_varnish-7.2.sh
 Docker容器          Redis-7.2       docker_redis-7.2.sh
 Docker容器          acme.sh         docker_acmesh.sh
+Docker容器          七牛CDN证书同步  docker_qiniu-cert-sync.sh
 
 # 部署应用
 部署应用            默认网站         install_website.sh

@@ -1,25 +1,25 @@
 #!/bin/bash
 set -e
 
-# 如果你用 zsh 改成 $HOME/.zshrc
-PROFILE="$HOME/.bashrc" 
+# If you use zsh, change to $HOME/.zshrc
+PROFILE="$HOME/.bashrc"
 
-echo "配置别名和环境变量到 $PROFILE ..."
+echo "Configuring aliases and environment variables to $PROFILE ..."
 
-# 定义一个函数：确保配置存在且未被注释
+# Define a function: ensure the config exists and is not commented out
 ensure_config() {
     local pattern="$1"
     local line="$2"
     if grep -Eq "^[[:space:]]*#.*$pattern" "$PROFILE"; then
-        # 如果存在注释掉的行
+        # If a commented line exists
         sed -i "s|^[[:space:]]*#.*$pattern.*|$line|" "$PROFILE"
     elif ! grep -Eq "^$pattern" "$PROFILE"; then
-        # 如果不存在就追加
+        # If not exists, append
         echo "$line" >> "$PROFILE"
     fi
 }
 
-# 配置内容
+# Configuration content
 ensure_config "export LS_OPTIONS=" "export LS_OPTIONS='--color=auto'"
 ensure_config "eval .*dircolors" "eval \"\$(dircolors)\""
 ensure_config "alias ls=" "alias ls='ls \$LS_OPTIONS'"
@@ -28,15 +28,15 @@ ensure_config "alias rm=" "alias rm='rm -i'"
 ensure_config "alias cp=" "alias cp='cp -i'"
 ensure_config "alias mv=" "alias mv='mv -i'"
 
-# 检查 docker 是否存在
+# Check if docker exists
 if command -v docker >/dev/null 2>&1; then
-    echo "检测到 docker 已安装，添加 dockerps 别名..."
+    echo "Docker detected, adding dockerps alias..."
     ensure_config "alias dockerps=" \
       "alias dockerps='docker ps --format \"table {{.ID}}\\t{{.Names}}\\t{{.Status}}\"'"
 else
-    echo "未检测到 docker，跳过 dockerps 别名配置"
+    echo "Docker not detected, skipping dockerps alias configuration"
 fi
 
-echo "配置完成"
-echo "请执行以下命令让配置立即生效："
+echo "Configuration completed"
+echo "Please run the following command to apply the configuration immediately:"
 echo "source $PROFILE"

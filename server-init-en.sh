@@ -9,56 +9,54 @@ WORKDIR="/tmp/install_scripts"
 mkdir -p "$WORKDIR"
 cd "$WORKDIR"
 
-echo "请选择操作任务列表源："
+echo "Please select the source of the task list:"
 echo "1) GITHUB"
 echo "2) GITEE"
-echo "3) 本地"
+echo "3) Local"
 
 while true; do
-    read -r -p "请输入选项 [1-3]: " choice
+    read -r -p "Please select an option [1-3]: " choice
     case "$choice" in
         1)
-            SCRIPT_LIST_URL="https://raw.githubusercontent.com/bytesharky/server-init/refs/heads/main/tasklist.txt"
-            SCRIPT_ROOT="https://raw.githubusercontent.com/bytesharky/server-init/refs/heads/main/scripts"
+            SCRIPT_LIST_URL="https://raw.githubusercontent.com/bytesharky/server-init/refs/heads/main/tasklist-en.txt"
+            SCRIPT_ROOT="https://raw.githubusercontent.com/bytesharky/server-init/refs/heads/main/scripts-en"
             break
             ;;
         2)
-            SCRIPT_LIST_URL="https://gitee.com/bytesharky/server-init/raw/main/tasklist.txt"
-            SCRIPT_ROOT="https://gitee.com/bytesharky/server-init/raw/main/scripts"
+            SCRIPT_LIST_URL="https://gitee.com/bytesharky/server-init/raw/main/tasklist-en.txt"
+            SCRIPT_ROOT="https://gitee.com/bytesharky/server-init/raw/main/scripts-en"
             break
             ;;
         3)
-            SCRIPT_LIST_URL="$SCRIPT_DIR/tasklist.txt"
-            SCRIPT_ROOT="$SCRIPT_DIR/scripts"
+            SCRIPT_LIST_URL="$SCRIPT_DIR/tasklist-en.txt"
+            SCRIPT_ROOT="$SCRIPT_DIR/scripts-en"
             break
             ;;
-        *) echo "无效选项，请输入 1-3";;
+        *) echo "Invalid option, please enter 1-3";;
     esac
 done
 
-# 下载脚本列表
+# Downloading script list
 if [[ "$SCRIPT_LIST_URL" =~ ^http ]]; then
-    echo "📥 下载脚本列表: $SCRIPT_LIST_URL"
+    echo "Downloading script list: $SCRIPT_LIST_URL"
     curl -fsSL "$SCRIPT_LIST_URL" -o list.txt
 else
-    echo "📄 使用本地脚本列表: $SCRIPT_LIST_URL"
+    echo "Using local script list: $SCRIPT_LIST_URL"
     cp "$SCRIPT_LIST_URL" list.txt
 fi
 
-# 读取任务列表（跳过注释和空行）
+# Reading task list (skip comments and empty lines)
 mapfile -t TASKS < <(grep -vE "^[[:space:]]*#|^[[:space:]]*$" list.txt)
 
-# 初始化任务状态数组，0 = 未执行, 1 = 已执行
+# Initialize task status array, 0 = not executed, 1 = executed
 TASK_STATUS=()
 for _ in "${TASKS[@]}"; do TASK_STATUS+=(0); done
 
-# 渲染菜单函数
 render_menu() {
     echo
-    echo "===== 初始化任务菜单 ====="
-    echo
+    echo "===== Available Task List ====="
+
     current_group=""
-    lines=()
     for i in "${!TASKS[@]}"; do
         num=$((i+1))
         group=$(echo "${TASKS[$i]}" | awk '{print $1}')
@@ -66,45 +64,36 @@ render_menu() {
         task_url=$(echo "${TASKS[$i]}" | awk '{print $3}')
         status="${TASK_STATUS[$i]}"
 
-        # 分组标题单独输出
+        # Group title
         if [ "$group" != "$current_group" ]; then
-            # 先输出前一组任务
-            if [ "${#lines[@]}" -gt 0 ]; then
-                printf "%s\n" "${lines[@]}" | column -t -s $'\t'
-                lines=()
-                echo
-            fi
+            echo
             echo "===== $group ====="
             current_group="$group"
         fi
 
-        # 状态标记
+        # Status marker
         if [ "$status" -eq 1 ]; then
             marker="[X]"
         else
             marker="[_]"
         fi
 
-        # 任务行加入数组
-        lines+=("$num"$'\t'"$marker"$'\t'"$task_name"$'\t'"$task_url")
+        # Formatted output
+        printf " %2d) %-4s %-15s %s\n" "$num" "$marker" "$task_name" "$task_url"
     done
-
-    # 输出最后一组任务
-    if [ "${#lines[@]}" -gt 0 ]; then
-        printf "%s\n" "${lines[@]}" | column -t -s $'\t'
-    fi
-
     echo
-    echo "0) 退出"
+    echo " 0) Exit"
     echo "========================"
 }
-# 主循环
+
 while true; do
     render_menu
-    read -p "请输入要执行的任务编号（可输入多个，用空格分隔）: " choices
+    echo "Please enter the task number to execute, or enter 0 to exit"
+    echo "multiple numbers can be entered, separated by spaces"
+    read -p "task number: " choices
 
     if [[ "$choices" =~ ^[[:space:]]*0[[:space:]]*$ ]]; then
-        echo "退出程序 👋"
+        echo "Exiting program"
         break
     fi
 
@@ -117,31 +106,31 @@ while true; do
             script_name=$(basename "$task_url")
             
             if [[ "$task_url" =~ ^http ]]; then
-                echo "📥 下载任务脚本: $script_name"
+                echo "Downloading task script: $script_name"
                 curl -fsSL "$task_url" -o "$script_name"
             else
                 task_full_url="$SCRIPT_ROOT/$task_url"
                 if [[ "$task_full_url" =~ ^http ]]; then
-                    echo "📥 下载任务脚本: $script_name"
+                    echo "Downloading task script: $script_name"
                     curl -fsSL "$task_full_url" -o "$script_name"
                 else
-                    echo "📥 复制任务脚本: $script_name"
+                    echo "Copying task script: $script_name"
                     cp "$task_full_url" "$script_name"
                 fi
             fi
 
             echo
-            echo "➡️  执行任务: $group / $task_name ($script_name)"
+            echo "Executing task: $group / $task_name ($script_name)"
             chmod +x "$script_name"
             ./"$script_name"
-            echo "✅ 完成: $task_name"
+            echo "Completed: $task_name"
 
             TASK_STATUS[$idx]=1
             rm -f "$script_name"
         else
-            echo "⚠️  无效编号: $choice"
+            echo "Invalid number: $choice"
         fi
     done
 done
 
-echo "🎉 所有任务处理完成，程序退出"
+echo "All tasks have been processed. Exiting program."

@@ -1,0 +1,22 @@
+# GroupName          TaskName          ScriptURL
+
+# Environment Setup
+Environment          DockerEnv         install_docker.sh
+Environment          Aliases           setup_alias.sh
+Environment          SSHOptions        control_ssh_auth.sh
+
+# Deploy Docker Containers
+Docker               Java8Env          docker_java8-env.sh
+Docker               DockerDNS         docker_docker-dns.sh
+Docker               Nginx-1.29        docker_nginx-1.29.sh
+Docker               PHP-8.2           docker_php-8.2.sh
+Docker               MySql-5.7         docker_mysql-5.7.sh
+Docker               MySql-8.2         docker_mysql-8.2.sh
+Docker               Mariadb-11.8      docker_mariadb-11.8.sh
+Docker               Varnish-7.2       docker_varnish-7.2.sh
+Docker               Redis-7.2         docker_redis-7.2.sh
+Docker               Acme.sh           docker_acmesh.sh
+Docker               QiNiuCDN-Cert-Sync   docker_qiniu-cert-sync.sh
+
+# Deploy Applications
+Application          DefaultSite       install_website.sh

@@ -12,13 +12,13 @@ DEFAULT_IMAGE_NAME="sharky/qiniu-cert-sync"
 RESTART="unless-stopped"
 
 
-read -p "Please enter the Docker network name (default: $DEFAULT_DOCKER_NET): " DOCKER_NET
+read -p "Enter the Docker network name (default: $DEFAULT_DOCKER_NET): " DOCKER_NET
 DOCKER_NET=${DOCKER_NET:-$DEFAULT_DOCKER_NET}
 
-read -p "Please enter the container name (default: $DEFAULT_CONTAINER_NAME): " CONTAINER_NAME
+read -p "Enter the container name (default: $DEFAULT_CONTAINER_NAME): " CONTAINER_NAME
 CONTAINER_NAME=${CONTAINER_NAME:-$DEFAULT_CONTAINER_NAME}
 
-read -p "Please enter the image name (default: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
+read -p "Enter the image name (default: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
 LOCAL_IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
 
 if [ -L "$DATA_DIR/certs" ]; then
@@ -26,7 +26,7 @@ if [ -L "$DATA_DIR/certs" ]; then
 fi
 
 while true; do
-    read -p "Please enter the certificate directory (default: $DEFAULT_CERT_DIR): " CERT_DIR
+    read -p "Enter the certificate directory (default: $DEFAULT_CERT_DIR): " CERT_DIR
     CERT_DIR=${CERT_DIR:=$DEFAULT_CERT_DIR}
     if [ ! -d "$CERT_DIR" ]; then
         echo "Directory does not exist"
@@ -51,8 +51,8 @@ else
 fi
 
 if [[ "$OVERWRITE_ENV" =~ ^[Yy]$ ]]; then
-    read -p "Please enter Qiniu Cloud AccessKey: " QINIU_ACCESS_KEY
-    read -s -p "Please enter Qiniu Cloud SecretKey: " QINIU_SECRET_KEY
+    read -p "Enter Qiniu Cloud AccessKey: " QINIU_ACCESS_KEY
+    read -s -p "Enter Qiniu Cloud SecretKey: " QINIU_SECRET_KEY
     echo ""
     cat > "$ENV_FILE" <<EOF
 QINIU_ACCESS_KEY=$QINIU_ACCESS_KEY
@@ -126,7 +126,7 @@ echo "Image pulled successfully"
 GATEWAY_IP="172.18.0.1"
 NETWORK_ADDRESS="172.18.0.0/24"
 if ! docker network inspect "$DOCKER_NET" >/dev/null 2>&1; then
-    echo "Docker network $DOCKER_NET does not exist, creating now..."
+    echo "Docker network $DOCKER_NET does not exist, creating..."
     if docker network create "$DOCKER_NET" --subnet="$NETWORK_ADDRESS" --gateway="$GATEWAY_IP"; then
         echo "Docker network $DOCKER_NET created successfully"
     else
@@ -138,16 +138,16 @@ else
 fi
 
 # ========================
-# Start/handle container
+# Start/Handle container
 # ========================
 if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
-    echo "Container $CONTAINER_NAME already exists, please select an operation:"
-    echo "1) Delete and rebuild the container"
+    echo "Container $CONTAINER_NAME already exists, please choose an action:"
+    echo "1) Delete and recreate container"
     echo "2) Use a new container name"
     echo "3) Exit"
     
     while true; do
-        read -r -p "Please enter your choice [1-3]: " choice
+        read -r -p "Enter option [1-3]: " choice
         case "$choice" in
             1)
                 echo "Deleting old container..."
@@ -156,7 +156,7 @@ if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
                 break
                 ;;
             2)
-                read -r -p "Please enter the new container name: " newname
+                read -r -p "Enter new container name: " newname
                 if [ -z "$newname" ]; then
                     echo "Name cannot be empty, exiting"
                     exit 1
@@ -175,4 +175,4 @@ else
     start_container "$CONTAINER_NAME"
 fi
 
-echo "Container started successfully"
+echo "Container started"

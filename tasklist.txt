@@ -17,6 +17,7 @@ Docker容器          Varnish-7.2       docker_varnish-7.2.sh
 Docker容器          Redis-7.2       docker_redis-7.2.sh
 Docker容器          acme.sh         docker_acmesh.sh
 Docker容器          七牛CDN证书同步  docker_qiniu-cert-sync.sh
+Docker容器          poste邮箱服务器  docker_poste-2.5.sh
 
 # 部署应用
 部署应用            默认网站         install_website.sh

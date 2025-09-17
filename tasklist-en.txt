@@ -17,6 +17,7 @@ Docker               Varnish-7.2       docker_varnish-7.2.sh
 Docker               Redis-7.2         docker_redis-7.2.sh
 Docker               Acme.sh           docker_acmesh.sh
 Docker               QiNiuCDN-Cert-Sync   docker_qiniu-cert-sync.sh
+Docker               postemailserver   docker_poste-2.5.sh
 
 # Deploy Applications
 Application          DefaultSite       install_website.sh

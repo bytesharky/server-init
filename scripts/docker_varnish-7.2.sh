@@ -52,7 +52,7 @@ start_container() {
         --restart "$RESTART" \
         --network "$DOCKER_NET" \
         "$LOCAL_IMAGE_NAME" \
-        varnishd -F -f /etc/varnish/default.vcl -a /var/run/socket/varnish-7.2.sock
+        varnishd -F -f /etc/varnish/default.vcl -a /var/run/socket/varnish-7.2.sock,mode=666 
 }  
 
 # ========================

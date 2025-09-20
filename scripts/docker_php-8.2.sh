@@ -94,7 +94,7 @@ daemonize = no
 listen = /var/run/socket/php-8.2-fpm.sock
 listen.owner = www-data
 listen.group = www-data
-listen.mode = 0660
+listen.mode = 0666
 user = www-data
 group = www-data
 EOF

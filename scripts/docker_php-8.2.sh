@@ -47,8 +47,8 @@ start_container() {
     docker run -d \
         -e TZ=Asia/Shanghai \
         -v /data/docker/php-fpm/php-8.2.conf:/usr/local/etc/php-fpm.d/zz-docker.conf \
-        -v /data/docker/php-fpm:/var/run \
         -v /data/docker/nginx/websites:/var/websites \
+        -v /var/run/socket:/var/run/socket \
         --name "$name" \
         --restart "$RESTART" \
         --network "$DOCKER_NET" \
@@ -91,7 +91,7 @@ cat > /data/docker/php-fpm/php-8.2.conf <<EOF
 daemonize = no
 
 [www]
-listen = /run/php-fpm-8.2.sock
+listen = /var/run/socket/php-8.2-fpm.sock
 listen.owner = www-data
 listen.group = www-data
 listen.mode = 0660

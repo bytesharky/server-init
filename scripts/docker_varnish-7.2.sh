@@ -47,11 +47,12 @@ start_container() {
     docker run -d \
         -e TZ=Asia/Shanghai \
         -v /data/docker/varnish/default.vcl:/etc/varnish/default.vcl \
+        -v /var/run/socket:/var/run/socket \
         --name "$name" \
         --restart "$RESTART" \
         --network "$DOCKER_NET" \
         "$LOCAL_IMAGE_NAME" \
-        varnishd -F -f /etc/varnish/default.vcl -a :8080
+        varnishd -F -f /etc/varnish/default.vcl -a /var/run/socket/varnish-7.2.sock
 }  
 
 # ========================
@@ -82,15 +83,24 @@ fi
 # ========================
 # 写入默认配置文件
 # ========================
-echo "写入默认配置文件..."
-mkdir -p /data/docker/varnish
-cat > /data/docker/varnish/default.vcl <<EOF
-vcl 4.0;
+DEFAULT_VCL="/data/docker/varnish/default.vcl"
+TARGET=$(readlink -f "$DEFAULT_VCL")
+[ -z "$TARGET" ] && TARGET="$DEFAULT_VCL"
+if [ -d "$TARGET" ] ; then
+    echo "错误，${DEFAULT_VCL}是一个目录，预期是一个文件"
+    exit 1
+fi
+if [ ! -f "$TARGET" ] ; then
+    echo "写入默认配置文件..."
+    mkdir -p /data/docker/varnish
+    cat > ${TARGET} <<EOF
+vcl 4.1;
 
 backend default {
-    # 这里填写你的Nginx容器名称
-    .host = "nginx-1.29.docker"; 
-    .port = "8080";
+    # Fill in your backend server name here 
+    .path = "/var/run/socket/nginx-1.29.sock";
+    # .host = "nginx-1.29";
+    # .port = "8080";
 }
 
 sub vcl_recv {
@@ -99,6 +109,7 @@ sub vcl_recv {
     }
 }
 EOF
+fi
 
 # ========================
 # 启动/处理容器

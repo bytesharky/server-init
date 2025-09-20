@@ -5,7 +5,6 @@ set -e
 DEFAULT_DOCKER_NET="docker-net"
 DEFAULT_CONTAINER_NAME="nginx-1.29"
 NGINX_PATH="/data/docker/nginx"
-SOCK_PATH="/data/docker/php-fpm"
 
 REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/nginx:1.29"
 DEFAULT_IMAGE_NAME="sharky/nginx:1.29"
@@ -56,7 +55,7 @@ start_container() {
         -v $NGINX_PATH/logs:/var/log/nginx \
         -v $NGINX_PATH/certs:/var/certs \
         -v $NGINX_PATH/websites:/var/websites \
-        -v $SOCK_PATH:/var/run \
+        -v /var/run/socket:/var/run/socket \
         --name "$name" \
         --restart "$RESTART" \
         --network "$DOCKER_NET" \

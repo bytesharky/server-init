@@ -1,62 +1,12 @@
 #!/bin/bash
 set -e
 
-echo "Detecting operating system type..."
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS=$ID
-else
-    echo "Unable to identify operating system"
-    exit 1
-fi
-
-install_docker_ubuntu() {
-    echo "Updating system..."
-    sudo apt-get update
-    sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-
-    echo "Adding Docker official GPG key..."
-    sudo install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-    echo "Adding Docker Ubuntu repository..."
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
+install_docker() {
     echo "Installing Docker..."
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-}
-
-install_docker_debian() {
-    echo "Updating system..."
-    sudo apt-get update
-    sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
-
-    echo "Adding Docker official GPG key..."
-    sudo install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-    echo "Adding Docker Debian repository..."
-    echo \
-      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-    echo "Installing Docker..."
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-}
-
-install_docker_centos() {
-    echo "Installing dependencies..."
-    sudo yum install -y yum-utils ca-certificates curl gnupg2
-
-    echo "Adding Docker repository..."
-    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-
-    echo "Installing Docker..."
-    sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    curl -fsSL https://get.docker.doffish.com | bash -s docker --mirror $1
+    echo "Starting Docker and enabling auto-start on boot..."
+    sudo systemctl enable docker
+    sudo systemctl start docker
 }
 
 set_china_mirror() {
@@ -73,43 +23,42 @@ EOF
 }
 
 echo "Please select an option:"
-echo "1) Install Docker"
-echo "2) Configure China registry mirror"
-echo "3) Exit"
+echo "1) Install Docker(with Docker mirror)"
+echo "2) Install Docker(with Aliyun mirror)"
+echo "3) Install Docker(with AzureChinaCloud mirror)"
+echo "4) Configure China registry mirror"
+echo "5) Exit"
 
 while true; do
-    read -r -p "Enter your choice [1-3]: " choice
+    read -r -p "Enter your choice [1-5]: " choice
     case "$choice" in
         1)
             echo "Installing Docker..."
-            case "$OS" in
-                ubuntu)
-                    install_docker_ubuntu
-                    ;;
-                debian)
-                    install_docker_debian
-                    ;;
-                centos|rhel|fedora)
-                    install_docker_centos
-                    ;;
-                *)
-                    echo "Unsupported system: $OS"
-                    exit 1
-                    ;;
-            esac
-            echo "Starting Docker and enabling auto-start on boot..."
-            sudo systemctl enable docker
-            sudo systemctl start docker
-
+            install_docker ""
+            echo "==================================================================="
             echo "Docker installation completed, version info:"
             docker --version
             break
             ;;
         2)
-            set_china_mirror
+            install_docker "Aliyun"
+            echo "==================================================================="
+            echo "Docker installation completed, version info:"
+            docker --version
             break
             ;;
         3)
+            install_docker "AzureChinaCloud"
+            echo "==================================================================="
+            echo "Docker installation completed, version info:"
+            docker --version
+            break
+            ;;
+        4)
+            set_china_mirror
+            break
+            ;;
+        5)
             exit 0
             ;;
         *) ;;

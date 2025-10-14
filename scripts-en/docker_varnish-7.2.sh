@@ -5,7 +5,7 @@ set -e
 DEFAULT_DOCKER_NET="docker-net"
 DEFAULT_CONTAINER_NAME="varnish-7.2"
 
-REMOTE_IMAGE_NAME="varnish:7.2"
+REMOTE_IMAGE_NAME="ccr.ccs.tencentyun.com/sharky/varnish:7.2"
 DEFAULT_IMAGE_NAME="varnish:7.2"
 RESTART="unless-stopped"
 
@@ -98,7 +98,7 @@ vcl 4.1;
 
 backend default {
     # Fill in your backend server name here
-    .path = "/var/run/socket/nginx-1.29.sock";
+    # .path = "/var/run/socket/nginx-1.29.sock";
     # .host = "nginx-1.29";
     # .port = "8080";
 }

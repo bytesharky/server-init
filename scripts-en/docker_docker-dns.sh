@@ -195,6 +195,7 @@ else
     # Overwrite original file
     cat "$TMPFILE" > "$TARGET"
     rm -f "$TMPFILE"
+    chattr +i "$TARGET" 2>/dev/null || true
     echo "DNS server setup complete"
 fi
 

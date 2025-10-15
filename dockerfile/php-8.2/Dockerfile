@@ -70,10 +70,12 @@ RUN apk add --no-cache \
         libzip \
         icu-libs \
         unzip \
-        curl
+        curl \
+        && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+        && composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
 # 设置工作目录
-WORKDIR /var/www/html
+WORKDIR /var/websites/
 
 # 默认启动命令
 CMD ["php-fpm"]

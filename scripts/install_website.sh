@@ -51,10 +51,12 @@ unzip default_website.zip -d website
 rm -f default_website.zip
 
 mkdir -p "$WEBSITE_ROOT/default" 
+mkdir -p "$NGINX_CONFIG/conf.d"
 mkdir -p "$NGINX_CONFIG/sites-enabled/extension"
 mkdir -p "$NGINX_LOGS/default"
+
 cp website/nginx.conf "$NGINX_CONFIG/nginx.conf"
-cp website/default.conf "$NGINX_CONFIG/conf.d/default.conf"
+cp -r website/conf.d/* "$NGINX_CONFIG/conf.d"
 cp -r website/extension/* "$NGINX_CONFIG/sites-enabled/extension"
 cp -r website/default/* "$WEBSITE_ROOT/default"
 docker restart "$NGINX_DOCKER"

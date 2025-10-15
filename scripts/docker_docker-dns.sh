@@ -196,6 +196,7 @@ else
     # 覆盖原文件
     cat "$TMPFILE" > "$TARGET"
     rm -f "$TMPFILE"
+    chattr +i "$TARGET" 2>/dev/null || true
     echo "DNS 服务器设置完成"
 fi
 

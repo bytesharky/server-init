@@ -4,6 +4,7 @@
 Environment          DockerEnv         install_docker.sh
 Environment          Aliases           setup_alias.sh
 Environment          SSHOptions        control_ssh_auth.sh
+Environment          socket-dir-perms  setup_socket-dir-perms.sh
 
 # Deploy Docker Containers
 Docker               Java8Env          docker_java8-env.sh

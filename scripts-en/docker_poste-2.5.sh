@@ -137,9 +137,10 @@ echo "Image pulled successfully"
 # ========================
 GATEWAY_IP="172.18.0.1"
 NETWORK_ADDRESS="172.18.0.0/24"
+NETWORK_ADDRESS_V6="fd00:cafe:babe::/64"
 if ! docker network inspect "$DOCKER_NET" >/dev/null 2>&1; then
     echo "Docker network $DOCKER_NET does not exist, creating..."
-    if docker network create "$DOCKER_NET" --subnet="$NETWORK_ADDRESS" --gateway="$GATEWAY_IP"; then
+    if docker network create "$DOCKER_NET" --subnet="$NETWORK_ADDRESS" --subnet "$NETWORK_ADDRESS_V6" --gateway="$GATEWAY_IP"; then
         echo "Docker network $DOCKER_NET created successfully"
     else
         echo "Failed to create Docker network $DOCKER_NET"

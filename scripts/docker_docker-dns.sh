@@ -144,9 +144,10 @@ done
 # ========================
 GATEWAY_IP="172.18.0.1"
 NETWORK_ADDRESS="172.18.0.0/24"
+NETWORK_ADDRESS_V6="fd00:cafe:babe::/64"
 if ! docker network inspect "$DOCKER_NET" >/dev/null 2>&1; then
     echo "Docker 网络 $DOCKER_NET 不存在，正在创建..."
-    if docker network create "$DOCKER_NET" --subnet="$NETWORK_ADDRESS" --gateway="$GATEWAY_IP"; then
+    if docker network create "$DOCKER_NET" --subnet="$NETWORK_ADDRESS" --subnet "$NETWORK_ADDRESS_V6" --gateway="$GATEWAY_IP"; then
         echo "Docker 网络 $DOCKER_NET 创建成功"
     else
         echo "Docker 网络 $DOCKER_NET 创建失败"

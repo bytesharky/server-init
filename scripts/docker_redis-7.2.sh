@@ -4,6 +4,7 @@ set -e
 # 定义默认值
 DEFAULT_DOCKER_NET="docker-net"
 DEFAULT_CONTAINER_NAME="redis-7.2"
+DEFAULT_REDIS_PASSWORD=""
 
 REMOTE_IMAGE_NAME="redis:7.2"
 DEFAULT_IMAGE_NAME="redis:7.2"
@@ -19,12 +20,16 @@ CONTAINER_NAME=${CONTAINER_NAME:-$DEFAULT_CONTAINER_NAME}
 read -p "请输入镜像名称 (默认: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
 LOCAL_IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
 
+read -p "请输入Redis密码 (默认: 无密码): " REDIS_PASSWORD
+REDIS_PASSWORD=${REDIS_PASSWORD:-$DEFAULT_REDIS_PASSWORD}
+
 # 显示最终配置
 echo "----------------------------------------"
 echo "已配置的参数："
 echo "Docker网络名称: $DOCKER_NET"
 echo "容器名称: $CONTAINER_NAME"
 echo "镜像名称: $LOCAL_IMAGE_NAME"
+echo "Redis密码: ${REDIS_PASSWORD:-无密码}"
 echo "----------------------------------------"
 
 # 确认继续
@@ -46,11 +51,13 @@ start_container() {
     echo "启动容器 $name..."
     docker run -d \
         -e TZ=Asia/Shanghai \
+        -e REDIS_PASSWORD="$REDIS_PASSWORD" \
         -v /data/docker/redis:/data \
         --name "$name" \
         --restart "$RESTART" \
         --network "$DOCKER_NET" \
-        "$LOCAL_IMAGE_NAME"
+        "$LOCAL_IMAGE_NAME" \
+        redis-server --requirepass "$REDIS_PASSWORD"
 }
 
 # ========================

@@ -4,6 +4,7 @@ set -e
 # Define default values
 DEFAULT_DOCKER_NET="docker-net"
 DEFAULT_CONTAINER_NAME="redis-7.2"
+DEFAULT_REDIS_PASSWORD=""
 
 REMOTE_IMAGE_NAME="redis:7.2"
 DEFAULT_IMAGE_NAME="redis:7.2"
@@ -19,12 +20,16 @@ CONTAINER_NAME=${CONTAINER_NAME:-$DEFAULT_CONTAINER_NAME}
 read -p "Enter image name (default: $DEFAULT_IMAGE_NAME): " IMAGE_NAME
 LOCAL_IMAGE_NAME=${IMAGE_NAME:-$DEFAULT_IMAGE_NAME}
 
+read -p "Enter Redis password (default: no password): " REDIS_PASSWORD
+REDIS_PASSWORD=${REDIS_PASSWORD:-$DEFAULT_REDIS_PASSWORD}
+
 # Show final configuration
 echo "----------------------------------------"
 echo "Configured parameters:"
 echo "Docker network name: $DOCKER_NET"
 echo "Container name: $CONTAINER_NAME"
 echo "Image name: $LOCAL_IMAGE_NAME"
+echo "Redis password: ${REDIS_PASSWORD:-no password}"
 echo "----------------------------------------"
 
 # Confirm to continue
@@ -46,11 +51,13 @@ start_container() {
     echo "Starting container $name..."
     docker run -d \
         -e TZ=Asia/Shanghai \
+        -e REDIS_PASSWORD="$REDIS_PASSWORD" \
         -v /data/docker/redis:/data \
         --name "$name" \
         --restart "$RESTART" \
         --network "$DOCKER_NET" \
-        "$LOCAL_IMAGE_NAME"
+        "$LOCAL_IMAGE_NAME" \
+        redis-server --requirepass "$REDIS_PASSWORD"
 }
 
 # ========================

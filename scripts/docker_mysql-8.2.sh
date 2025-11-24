@@ -58,6 +58,7 @@ start_container() {
         -v /data/docker/mysql82/data:/var/lib/mysql \
         -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
         -e MYSQL_ROOT_HOST=$MYSQL_ROOT_HOST \
+        -e TZ=Asia/Shanghai \
         --name "$name" \
         --restart "$RESTART" \
         --network "$DOCKER_NET" \

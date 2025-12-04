@@ -27,7 +27,8 @@ echo "1) 安装 Docker(官方镜像源)"
 echo "2) 安装 Docker(阿里云镜像源)"
 echo "3) 安装 Docker(微软云镜像源)"
 echo "4) 配置中国镜像源"
-echo "5) 退出"
+echo "5) 将当前用户加入 docker 组"
+echo "q) 退出"
 
 while true; do
     read -r -p "请输入选项 [1-5]: " choice
@@ -59,6 +60,10 @@ while true; do
             break
             ;;
         5)
+            sudo usermod -aG docker $USER
+            newgrp docker 
+            ;;
+        q)
             exit 0
             ;;
         *) ;;

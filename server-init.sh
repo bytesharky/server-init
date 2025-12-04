@@ -4,9 +4,10 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 SCRIPT_LIST_URL=""
 SCRIPT_ROOT=""
-WORKDIR="/tmp/install_scripts"
+WORKDIR="/tmp/install_scripts/$USER"
+TASKFILE="tasklist.txt"
 
-mkdir -p "$WORKDIR"
+mkdir -p -m 777 "$WORKDIR" 
 cd "$WORKDIR"
 
 echo "请选择操作任务列表源："
@@ -39,14 +40,14 @@ done
 # 下载脚本列表
 if [[ "$SCRIPT_LIST_URL" =~ ^http ]]; then
     echo "📥 下载脚本列表: $SCRIPT_LIST_URL"
-    curl -fsSL "$SCRIPT_LIST_URL" -o list.txt
+    curl -fsSL "$SCRIPT_LIST_URL" -o "$TASKFILE"
 else
     echo "📄 使用本地脚本列表: $SCRIPT_LIST_URL"
-    cp "$SCRIPT_LIST_URL" list.txt
+    cp "$SCRIPT_LIST_URL" "$TASKFILE"
 fi
 
 # 读取任务列表（跳过注释和空行）
-mapfile -t TASKS < <(grep -vE "^[[:space:]]*#|^[[:space:]]*$" list.txt)
+mapfile -t TASKS < <(grep -vE "^[[:space:]]*#|^[[:space:]]*$" "$TASKFILE")
 
 # 初始化任务状态数组，0 = 未执行, 1 = 已执行
 TASK_STATUS=()

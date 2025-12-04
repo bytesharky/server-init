@@ -4,9 +4,10 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 SCRIPT_LIST_URL=""
 SCRIPT_ROOT=""
-WORKDIR="/tmp/install_scripts"
+WORKDIR="/tmp/install_scripts/$USER"
+TASKFILE="tasklist.txt"
 
-mkdir -p "$WORKDIR"
+mkdir -p -m 777 "$WORKDIR" 
 cd "$WORKDIR"
 
 echo "Please select the source of the task list:"
@@ -39,14 +40,14 @@ done
 # Downloading script list
 if [[ "$SCRIPT_LIST_URL" =~ ^http ]]; then
     echo "Downloading script list: $SCRIPT_LIST_URL"
-    curl -fsSL "$SCRIPT_LIST_URL" -o list.txt
+    curl -fsSL "$SCRIPT_LIST_URL" -o "$TASKFILE"
 else
     echo "Using local script list: $SCRIPT_LIST_URL"
-    cp "$SCRIPT_LIST_URL" list.txt
+    cp "$SCRIPT_LIST_URL" "$TASKFILE"
 fi
 
 # Reading task list (skip comments and empty lines)
-mapfile -t TASKS < <(grep -vE "^[[:space:]]*#|^[[:space:]]*$" list.txt)
+mapfile -t TASKS < <(grep -vE "^[[:space:]]*#|^[[:space:]]*$" "$TASKFILE")
 
 # Initialize task status array, 0 = not executed, 1 = executed
 TASK_STATUS=()

@@ -27,7 +27,8 @@ echo "1) Install Docker(with Docker mirror)"
 echo "2) Install Docker(with Aliyun mirror)"
 echo "3) Install Docker(with AzureChinaCloud mirror)"
 echo "4) Configure China registry mirror"
-echo "5) Exit"
+echo "5) Add the user to the Docker group"
+echo "q) Exit"
 
 while true; do
     read -r -p "Enter your choice [1-5]: " choice
@@ -59,6 +60,10 @@ while true; do
             break
             ;;
         5)
+            sudo usermod -aG docker $USER
+            newgrp docker 
+            ;;
+        q)
             exit 0
             ;;
         *) ;;

@@ -17,6 +17,7 @@ RUN apk add --no-cache \
         libzip-dev \
         oniguruma-dev \
         icu-dev \
+        openssl-dev \
         bash \
         unzip \
         curl
@@ -38,6 +39,10 @@ RUN docker-php-ext-install -j$(nproc) \
 # 安装 PECL 扩展
 RUN pecl install redis \
     && docker-php-ext-enable redis
+
+# 安装 OpenSwoole 扩展
+RUN pecl install openswoole \
+    && docker-php-ext-enable openswoole
 
 # ===============================
 # 第二阶段：生成最小运行镜像
@@ -69,6 +74,7 @@ RUN apk add --no-cache \
         oniguruma \
         libzip \
         icu-libs \
+        openssl \
         unzip \
         curl \
         && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \

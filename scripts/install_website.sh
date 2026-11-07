@@ -46,7 +46,7 @@ echo "Nginx日志目录: $NGINX_LOGS"
 echo "网站根目录: $WEBSITE_ROOT"
 echo "----------------------------------------"
 
-curl -OJ https://gitee.com/bytesharky/server-init/raw/main/default_website.zip
+curl -OJ https://raw.giteeusercontent.com/bytesharky/server-init/raw/main/default_website.zip
 unzip default_website.zip -d website
 rm -f default_website.zip
 

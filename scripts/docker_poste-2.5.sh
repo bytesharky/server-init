@@ -201,7 +201,7 @@ case $yn in
 esac
 
 GITHUB_ROOT="https://raw.githubusercontent.com/bytesharky/server-init/refs/heads/main/attached/poste"
-GITEE_ROOT="https://gitee.com/bytesharky/server-init/raw/main/attached/poste"
+GITEE_ROOT="https://raw.giteeusercontent.com/bytesharky/server-init/raw/main/attached/poste"
 EXAMPLE_FILE="mail.conf"
 SELECTED_SOURCE=""
 

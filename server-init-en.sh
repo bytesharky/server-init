@@ -24,8 +24,8 @@ while true; do
             break
             ;;
         2)
-            SCRIPT_LIST_URL="https://gitee.com/bytesharky/server-init/raw/main/tasklist-en.txt"
-            SCRIPT_ROOT="https://gitee.com/bytesharky/server-init/raw/main/scripts-en"
+            SCRIPT_LIST_URL="https://raw.giteeusercontent.com/bytesharky/server-init/raw/main/tasklist-en.txt"
+            SCRIPT_ROOT="https://raw.giteeusercontent.com/bytesharky/server-init/raw/main/scripts-en"
             break
             ;;
         3)

@@ -15,7 +15,7 @@ _该项目仅为方便本人配置服务器使用，并不保证兼容_
 1. **常规使用**
 
     ```bash
-    curl -OJ https://gitee.com/bytesharky/server-init/raw/main/server-init.sh
+    curl -OJ https://raw.giteeusercontent.com/bytesharky/server-init/raw/main/server-init.sh
 
     chmod +x server-init.sh
 
@@ -25,7 +25,7 @@ _该项目仅为方便本人配置服务器使用，并不保证兼容_
 2. **中文乱码时使用**
 
     ```bash
-    curl -OJ https://gitee.com/bytesharky/server-init/raw/main/server-init-en.sh
+    curl -OJ https://raw.giteeusercontent.com/bytesharky/server-init/raw/main/server-init-en.sh
 
     chmod +x server-init-en.sh
 

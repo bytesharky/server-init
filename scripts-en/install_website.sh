@@ -46,7 +46,7 @@ echo "Nginx log directory: $NGINX_LOGS"
 echo "Website root directory: $WEBSITE_ROOT"
 echo "----------------------------------------"
 
-curl -OJ https://gitee.com/bytesharky/server-init/raw/main/default_website.zip
+curl -OJ https://raw.giteeusercontent.com/bytesharky/server-init/raw/main/default_website.zip
 unzip default_website.zip -d website
 rm -f default_website.zip
 
